@@ -1,0 +1,30 @@
+package com.alerta360.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+@Configuration
+public class SecurityConfiguration {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf().disable() // desabilita CSRF para testes (cuidado com isso em produção)
+                .authorizeHttpRequests(authz -> authz
+                        .anyRequest().permitAll() // libera todas as rotas
+                )
+                .httpBasic().disable() // desativa autenticação básica
+                .formLogin().disable(); // desativa formulário de login
+
+        return http.build();
+    }
+}

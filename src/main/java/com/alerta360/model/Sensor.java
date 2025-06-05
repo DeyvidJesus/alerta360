@@ -18,11 +18,11 @@ public class Sensor {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String codigoSensor;        // Ex: "TEMP_001", "HUM_SALA_02"
+    private String codigoSensor;
 
-    private String nome;                // Nome amigável
-    private String tipo;                // TEMPERATURA, UMIDADE, MULTISENSOR
-    private String localizacao;         // Ex: "Sala Principal", "Galpão A"
+    private String nome;
+    private String tipo;
+    private String localizacao;
     private boolean ativo;
     private LocalDateTime dataCadastro;
     private LocalDateTime ultimaLeitura;

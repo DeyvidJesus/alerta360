@@ -27,7 +27,6 @@ public class SensorService {
     private LeituraSensorRepository leituraRepository;
 
     public Sensor criarSensor(Sensor sensor) {
-        // Verificar se código já existe
         if (sensorRepository.existsByCodigoSensor(sensor.getCodigoSensor())) {
             throw new SensorJaExisteException("Sensor com código " + sensor.getCodigoSensor() + " já existe");
         }
