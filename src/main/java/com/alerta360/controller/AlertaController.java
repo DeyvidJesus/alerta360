@@ -3,6 +3,7 @@ package com.alerta360.controller;
 import com.alerta360.model.Alerta;
 import com.alerta360.service.AlertaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,12 @@ public class AlertaController {
 
     @Autowired
     private AlertaService alertaService;
+
+    @PostMapping
+    public ResponseEntity<Alerta> criarAlertaManual(@RequestBody Alerta alertaJson) {
+        Alerta alertaSalvo = alertaService.criarAlertaManual(alertaJson);
+        return ResponseEntity.status(HttpStatus.CREATED).body(alertaSalvo);
+    }
 
     @GetMapping("/ativos")
     public ResponseEntity<List<Alerta>> listarAlertasAtivos() {

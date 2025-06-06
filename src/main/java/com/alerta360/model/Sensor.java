@@ -1,5 +1,6 @@
 package com.alerta360.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,5 +29,6 @@ public class Sensor {
     private LocalDateTime ultimaLeitura;
 
     @OneToMany(mappedBy = "sensor", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<LeituraSensor> leituras = new ArrayList<>();
 }

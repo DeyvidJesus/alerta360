@@ -23,12 +23,11 @@ public class LeituraSensor {
     private Sensor sensor;
 
     @Column(columnDefinition = "JSON")
-    private String dados;               // JSON com todos os dados do sensor
+    private String dados;
 
     private LocalDateTime timestamp;
-    private String status;              // OK, ALERTA, ERRO
+    private String status;
 
-    // Método para converter JSON em Map
     @Transient
     public Map<String, Object> getDadosMap() {
         try {
@@ -39,7 +38,6 @@ public class LeituraSensor {
         }
     }
 
-    // Método para definir dados a partir de Map
     public void setDadosMap(Map<String, Object> dadosMap) {
         try {
             ObjectMapper mapper = new ObjectMapper();

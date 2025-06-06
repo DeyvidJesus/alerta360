@@ -44,7 +44,7 @@ public class SensorController {
 
     @GetMapping("/tipo/{tipo}")
     public ResponseEntity<List<Sensor>> listarPorTipo(@PathVariable String tipo) {
-        List<Sensor> sensores = sensorService.listarPorTipo(tipo);
+        List<Sensor> sensores = sensorService.listarPorTipo(tipo.toLowerCase());
         return ResponseEntity.ok(sensores);
     }
 

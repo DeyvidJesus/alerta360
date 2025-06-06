@@ -22,7 +22,7 @@ public interface SensorRepository extends JpaRepository<Sensor, Long> {
     List<Sensor> findByAtivoTrue();
 
     // Listar por tipo
-    List<Sensor> findByTipo(String tipo);
+    List<Sensor> findByTipoIgnoreCase(String tipo);
 
     // Buscar sensores sem leitura recente (para verificar inativos)
     @Query("SELECT s FROM Sensor s WHERE s.ultimaLeitura IS NULL OR s.ultimaLeitura < :limite")

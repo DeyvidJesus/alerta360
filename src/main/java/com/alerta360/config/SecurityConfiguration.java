@@ -18,7 +18,7 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable() // desabilita CSRF para testes (cuidado com isso em produção)
+                .csrf().disable()
                 .authorizeHttpRequests(authz -> authz
                         .anyRequest().permitAll() // libera todas as rotas
                 )

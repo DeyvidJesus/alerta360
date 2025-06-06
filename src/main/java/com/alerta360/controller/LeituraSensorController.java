@@ -2,6 +2,8 @@ package com.alerta360.controller;
 
 import com.alerta360.model.LeituraSensor;
 import com.alerta360.service.LeituraSensorService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -23,9 +25,10 @@ public class LeituraSensorController {
     @PostMapping("/{codigoSensor}")
     public ResponseEntity<LeituraSensor> processarDados(
             @PathVariable String codigoSensor,
-            @RequestBody Map<String, Object> dadosJson) {
-        LeituraSensor leitura = leituraService.processarDadosSensor(codigoSensor, dadosJson);
-        return new ResponseEntity<>(leitura, HttpStatus.CREATED);
+            @RequestBody LeituraSensor leitura) {
+
+        LeituraSensor novaLeitura = leituraService.processarLeituraExistente(codigoSensor, leitura);
+        return new ResponseEntity<>(novaLeitura, HttpStatus.CREATED);
     }
 
     @GetMapping("/{codigoSensor}")

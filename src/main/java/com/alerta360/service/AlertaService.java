@@ -1,10 +1,15 @@
 package com.alerta360.service;
 
 import com.alerta360.exception.alerta.AlertaNaoEncontradoException;
+import com.alerta360.exception.sensor.SensorNaoEncontradoException;
 import com.alerta360.model.Alerta;
 import com.alerta360.model.LeituraSensor;
+import com.alerta360.model.Sensor;
 import com.alerta360.repository.LeituraSensorRepository;
 import com.alerta360.repository.AlertaRepository;
+import com.alerta360.repository.SensorRepository;
+import com.alerta360.utils.RegraAlerta;
+import com.alerta360.utils.RegrasAlertaProvider;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +29,12 @@ public class AlertaService {
     @Autowired
     private LeituraSensorRepository leituraRepository;
 
+    @Autowired
+    private RegrasAlertaProvider regrasProvider;
+
+    @Autowired
+    private SensorRepository sensorRepository;
+
     public void verificarECriarAlertas(LeituraSensor leitura) {
         String status = leitura.getStatus();
         Map<String, Object> dados = leitura.getDadosMap();
@@ -31,26 +42,36 @@ public class AlertaService {
         if ("ALERTA".equals(status)) {
             criarAlertasEspecificos(leitura, dados);
         } else if ("ERRO".equals(status)) {
-            criarAlertaErro(leitura);
+            criarAlerta(leitura, "ERRO_LEITURA", "Erro na leitura dos dados do sensor");
         }
     }
 
     private void criarAlertasEspecificos(LeituraSensor leitura, Map<String, Object> dados) {
-        // TODO - Criar alertas dinâmicos, com mensagens e tipos dinâmicos.
-    }
+        for (RegraAlerta regra : regrasProvider.getRegras()) {
+            if (!dados.containsKey(regra.getCampo())) continue;
 
-    private void criarAlertaErro(LeituraSensor leitura) {
-        criarAlerta(leitura, "ERRO_LEITURA", "Erro na leitura dos dados do sensor");
+            try {
+                Double valor = Double.parseDouble(dados.get(regra.getCampo()).toString());
+
+                if (regra.verificar(valor)) {
+                    criarAlerta(leitura, regra.getTipoAlerta(), regra.getMensagemFormatada(valor));
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
     }
 
     private void criarAlerta(LeituraSensor leitura, String tipoAlerta, String mensagem) {
+        Sensor sensor = leitura.getSensor();
         LocalDateTime limite = LocalDateTime.now().minusHours(2);
+
         boolean alertaRecente = alertaRepository.existsByTipoAlertaAndSensorAndDataHoraAfterAndResolvidoFalse(
-                tipoAlerta, leitura.getSensor(), limite);
+                tipoAlerta, sensor, limite
+        );
 
         if (!alertaRecente) {
             Alerta alerta = new Alerta();
-            alerta.setSensor(leitura.getSensor());
+            alerta.setSensor(sensor);
             alerta.setLeitura(leitura);
             alerta.setTipoAlerta(tipoAlerta);
             alerta.setMensagem(mensagem);
@@ -105,5 +126,33 @@ public class AlertaService {
                 }
             }
         }
+    }
+
+    public Alerta criarAlertaManual(Alerta alertaJson) {
+        if (alertaJson.getSensor() == null || alertaJson.getSensor().getId() == null) {
+            throw new IllegalArgumentException("Sensor deve ser informado com ID");
+        }
+
+        Sensor sensor = sensorRepository.findById(alertaJson.getSensor().getId())
+                .orElseThrow(() -> new SensorNaoEncontradoException("Sensor não encontrado"));
+
+        alertaJson.setSensor(sensor);
+
+        if (alertaJson.getLeitura() != null && alertaJson.getLeitura().getId() != null) {
+            LeituraSensor leitura = leituraRepository.findById(alertaJson.getLeitura().getId())
+                    .orElseThrow(() -> new RuntimeException("Leitura não encontrada"));
+            alertaJson.setLeitura(leitura);
+        } else {
+            alertaJson.setLeitura(null);
+        }
+
+        if (alertaJson.getDataHora() == null) {
+            alertaJson.setDataHora(LocalDateTime.now());
+        }
+
+        alertaJson.setResolvido(false);
+        alertaJson.setDataResolucao(null);
+
+        return alertaRepository.save(alertaJson);
     }
 }
