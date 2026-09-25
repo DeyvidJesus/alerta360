@@ -2,7 +2,8 @@ package com.alerta360.service;
 
 import com.alerta360.model.Alerta;
 import com.alerta360.model.Sensor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -11,17 +12,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
+@RequiredArgsConstructor
 @Service
 public class DashboardService {
 
-    @Autowired
-    private SensorService sensorService;
+    private final SensorService sensorService;
 
-    @Autowired
-    private LeituraSensorService leituraService;
+    private final LeituraSensorService leituraService;
 
-    @Autowired
-    private AlertaService alertaService;
+    private final AlertaService alertaService;
 
     public Map<String, Object> obterResumoGeral() {
         Map<String, Object> resumo = new HashMap<>();
@@ -75,8 +75,8 @@ public class DashboardService {
                 resumoSensores.add(resumoSensor);
 
             } catch (Exception e) {
-                // Log do erro e continua com próximo sensor
-                System.err.println("Erro ao obter dados do sensor " + sensor.getCodigoSensor() + ": " + e.getMessage());
+                // Falha em um sensor não deve derrubar o dashboard inteiro
+                log.warn("Erro ao obter dados do sensor {}: {}", sensor.getCodigoSensor(), e.getMessage());
             }
         }
 

@@ -1,6 +1,8 @@
 package com.alerta360.service;
 
+import com.alerta360.exception.alerta.AlertaJaResolvidoException;
 import com.alerta360.exception.alerta.AlertaNaoEncontradoException;
+import com.alerta360.exception.leitura_sensor.LeituraNaoEncontradaException;
 import com.alerta360.exception.sensor.SensorNaoEncontradoException;
 import com.alerta360.model.Alerta;
 import com.alerta360.model.LeituraSensor;
@@ -11,7 +13,7 @@ import com.alerta360.repository.SensorRepository;
 import com.alerta360.utils.RegraAlerta;
 import com.alerta360.utils.RegrasAlertaProvider;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,29 +21,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class AlertaService {
 
-    @Autowired
-    private AlertaRepository alertaRepository;
+    private final AlertaRepository alertaRepository;
 
-    @Autowired
-    private LeituraSensorRepository leituraRepository;
+    private final LeituraSensorRepository leituraRepository;
 
-    @Autowired
-    private RegrasAlertaProvider regrasProvider;
+    private final RegrasAlertaProvider regrasProvider;
 
-    @Autowired
-    private SensorRepository sensorRepository;
+    private final SensorRepository sensorRepository;
 
     public void verificarECriarAlertas(LeituraSensor leitura) {
         String status = leitura.getStatus();
         Map<String, Object> dados = leitura.getDadosMap();
 
-        if ("ALERTA".equals(status)) {
+        if ("ALERTA".equalsIgnoreCase(status)) {
             criarAlertasEspecificos(leitura, dados);
-        } else if ("ERRO".equals(status)) {
+        } else if ("ERRO".equalsIgnoreCase(status)) {
             criarAlerta(leitura, "ERRO_LEITURA", "Erro na leitura dos dados do sensor");
         }
     }
@@ -92,7 +91,11 @@ public class AlertaService {
 
     public Alerta resolverAlerta(Long alertaId, String observacoes) {
         Alerta alerta = alertaRepository.findById(alertaId)
-                .orElseThrow(() -> new AlertaNaoEncontradoException("Alerta não encontrado"));
+                .orElseThrow(() -> new AlertaNaoEncontradoException("Alerta não encontrado: " + alertaId));
+
+        if (alerta.isResolvido()) {
+            throw new AlertaJaResolvidoException("Alerta " + alertaId + " já foi resolvido");
+        }
 
         alerta.setResolvido(true);
         alerta.setDataResolucao(LocalDateTime.now());
@@ -140,7 +143,7 @@ public class AlertaService {
 
         if (alertaJson.getLeitura() != null && alertaJson.getLeitura().getId() != null) {
             LeituraSensor leitura = leituraRepository.findById(alertaJson.getLeitura().getId())
-                    .orElseThrow(() -> new RuntimeException("Leitura não encontrada"));
+                    .orElseThrow(() -> new LeituraNaoEncontradaException("Leitura não encontrada"));
             alertaJson.setLeitura(leitura);
         } else {
             alertaJson.setLeitura(null);

@@ -7,21 +7,20 @@ import com.alerta360.model.Sensor;
 import com.alerta360.repository.LeituraSensorRepository;
 import com.alerta360.repository.SensorRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+@RequiredArgsConstructor
 @Service
 @Transactional
 public class SensorService {
 
-    @Autowired
-    private SensorRepository sensorRepository;
+    private final SensorRepository sensorRepository;
 
-    @Autowired
-    private LeituraSensorRepository leituraRepository;
+    private final LeituraSensorRepository leituraRepository;
 
     public Sensor criarSensor(Sensor sensor) {
         if (sensorRepository.existsByCodigoSensor(sensor.getCodigoSensor())) {

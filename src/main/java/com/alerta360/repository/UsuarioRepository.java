@@ -1,5 +1,6 @@
 package com.alerta360.repository;
 
+import com.alerta360.model.TipoUsuario;
 import com.alerta360.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -22,10 +23,10 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     List<Usuario> findByAtivoTrue();
 
     // Buscar por tipo de usuário
-    List<Usuario> findByTipo(String tipo);
+    List<Usuario> findByTipo(TipoUsuario tipo);
 
     // Buscar usuários ativos por tipo
-    List<Usuario> findByAtivoTrueAndTipo(String tipo);
+    List<Usuario> findByAtivoTrueAndTipo(TipoUsuario tipo);
 
     // Buscar por nome (busca parcial)
     List<Usuario> findByNomeContainingIgnoreCase(String nome);

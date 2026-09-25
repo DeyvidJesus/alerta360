@@ -2,7 +2,7 @@ package com.alerta360.controller;
 
 import com.alerta360.model.Alerta;
 import com.alerta360.service.AlertaService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/alertas")
 @CrossOrigin(origins = "*")
 public class AlertaController {
 
-    @Autowired
-    private AlertaService alertaService;
+    private final AlertaService alertaService;
 
     @PostMapping
     public ResponseEntity<Alerta> criarAlertaManual(@RequestBody Alerta alertaJson) {
