@@ -1,0 +1,36 @@
+services:
+  oracle:
+    image: gvenzl/oracle-free:23-slim-faststart
+    container_name: alerta360-oracle
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD:-oracle}
+      # Cria o usuário da aplicação no PDB FREEPDB1
+      APP_USER: ${DB_USERNAME:-alerta360}
+      APP_USER_PASSWORD: ${DB_PASSWORD:-DBalerta360}
+    ports:
+      - "1521:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  api:
+    build: .
+    container_name: alerta360-api
+    depends_on:
+      oracle:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:oracle:thin:@oracle:1521/FREEPDB1
+      DB_USERNAME: ${DB_USERNAME:-alerta360}
+      DB_PASSWORD: ${DB_PASSWORD:-DBalerta360}
+      SERVER_PORT: 3000
+    ports:
+      - "3000:3000"
+
+volumes:
+  oracle-data:
