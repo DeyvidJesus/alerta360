@@ -1,20 +1,20 @@
 package com.alerta360.controller;
 
 import com.alerta360.service.DashboardService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/dashboard")
 @CrossOrigin(origins = "*")
 public class DashboardController {
 
-    @Autowired
-    private DashboardService dashboardService;
+    private final DashboardService dashboardService;
 
     @GetMapping("/resumo")
     public ResponseEntity<Map<String, Object>> obterResumoGeral() {

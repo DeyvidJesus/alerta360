@@ -2,7 +2,7 @@ package com.alerta360.controller;
 
 import com.alerta360.model.Sensor;
 import com.alerta360.service.SensorService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,13 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/sensores")
 @CrossOrigin(origins = "*")
 public class SensorController {
 
-    @Autowired
-    private SensorService sensorService;
+    private final SensorService sensorService;
 
     @PostMapping
     public ResponseEntity<Sensor> criarSensor(@RequestBody Sensor sensor) {

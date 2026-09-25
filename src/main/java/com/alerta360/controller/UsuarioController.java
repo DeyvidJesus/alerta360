@@ -2,7 +2,7 @@ package com.alerta360.controller;
 
 import com.alerta360.model.Usuario;
 import com.alerta360.service.UsuarioService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,17 +10,16 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/usuarios")
 @CrossOrigin(origins = "*")
 public class UsuarioController {
 
-    @Autowired
-    private UsuarioService usuarioService;
+    private final UsuarioService usuarioService;
 
     @PostMapping
     public ResponseEntity<Usuario> criarUsuario(@RequestBody Usuario usuario) {
-        System.out.println(usuario);
         Usuario usuarioCriado = usuarioService.criarUsuario(usuario);
         return new ResponseEntity<>(usuarioCriado, HttpStatus.CREATED);
     }

@@ -1,5 +1,6 @@
 package com.alerta360.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,14 +19,14 @@ public class Usuario {
     @Column(unique = true)
     private String email;
     private String nome;
+
+    // Aceita a senha na entrada, mas nunca devolve o hash nas respostas
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String senha;
+
     private boolean ativo;
     private LocalDateTime dataCadastro;
 
     @Enumerated(EnumType.STRING)
-    private TipoUsuario tipo;           // ADMIN, OPERADOR, VISUALIZADOR
-}
-
-enum TipoUsuario {
-    ADMIN, OPERADOR, VISUALIZADOR
+    private TipoUsuario tipo;
 }
